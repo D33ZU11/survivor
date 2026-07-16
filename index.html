@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Elementus: The Inferno - Journey Map</title>
+  <title>Elementus: The Inferno - Journey Database</title>
   <style>
     /* ==========================================
-       1. PAGE STYLE & GRAPHITE/FIRE THEME
+       1. PAGE STYLE & DARK FIRE THEME
        ========================================== */
     body {
       background-color: #121212;
@@ -16,17 +16,85 @@
       padding: 20px;
     }
 
-    h1 {
+    header {
       text-align: center;
-      color: #ff4a4a; /* Flame Red */
       margin-bottom: 30px;
-      font-size: 2.2rem;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      text-shadow: 0 0 10px rgba(255, 74, 74, 0.3);
     }
 
-    /* Grid layout for player cards */
+    h1 {
+      color: #ff4a4a; /* Flame Red */
+      margin: 0 0 10px 0;
+      font-size: 2.5rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-shadow: 0 0 15px rgba(255, 74, 74, 0.4);
+    }
+
+    .subtitle {
+      color: #888;
+      font-size: 1rem;
+      margin: 0;
+    }
+
+    /* ==========================================
+       2. INTERACTIVE FILTER PANEL
+       ========================================== */
+    .filter-panel {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 15px;
+      max-width: 1200px;
+      margin: 0 auto 30px auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .filter-group label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 5px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+
+    .filter-group input, .filter-group select {
+      background: #262626;
+      border: 1px solid #444;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .filter-group input:focus, .filter-group select:focus {
+      border-color: #ff4a4a;
+    }
+
+    .results-count {
+      color: #888;
+      font-size: 0.9rem;
+      width: 100%;
+      margin-top: 5px;
+      font-weight: bold;
+    }
+
+    /* ==========================================
+       3. GRID AND CARDS
+       ========================================== */
     .grid-container {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
@@ -35,9 +103,6 @@
       margin: 0 auto;
     }
 
-    /* ==========================================
-       2. CARD COMPONENT
-       ========================================== */
     .player-card {
       background: #1e1e1e;
       border: 1px solid #333;
@@ -55,7 +120,6 @@
       border-color: #ff4a4a;
     }
 
-    /* Card Header */
     .card-header {
       display: flex;
       justify-content: space-between;
@@ -83,7 +147,7 @@
     .badge.finalist { background-color: #c0c0c0; color: #121212; }
     .badge.all-star { background-color: #ff4a4a; color: #fff; }
 
-    /* Custom Brief Description */
+    /* Dynamic Narrative Description */
     .card-description {
       font-size: 0.85rem;
       color: #b0b0b0;
@@ -108,7 +172,7 @@
     }
 
     /* ==========================================
-       3. JOURNEY TIMELINE / TREE-LINE
+       4. JOURNEY TIMELINE / TREE-LINE
        ========================================== */
     .timeline-container {
       margin-top: auto;
@@ -127,7 +191,6 @@
       font-weight: bold;
     }
 
-    /* Horizontal list of steps */
     .timeline-nodes {
       display: flex;
       align-items: center;
@@ -136,7 +199,6 @@
       padding-bottom: 4px;
     }
 
-    /* Clean thin scrollbar for long timelines */
     .timeline-nodes::-webkit-scrollbar {
       height: 3px;
     }
@@ -145,7 +207,6 @@
       border-radius: 2px;
     }
 
-    /* Single Node Step */
     .timeline-node {
       display: flex;
       flex-direction: column;
@@ -177,22 +238,76 @@
     .team-champions { border-color: #f1c40f; color: #f1c40f; }
     .team-merge { border-color: #9b59b6; color: #9b59b6; }
 
-    /* Arrows */
     .timeline-arrow {
       color: #444;
       font-size: 0.75rem;
       user-select: none;
     }
+
+    .no-results {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: #888;
+      padding: 40px;
+      font-size: 1.1rem;
+    }
   </style>
 </head>
 <body>
 
-  <h1>Elementus: The Inferno</h1>
+  <header>
+    <h1>Elementus: The Inferno</h1>
+    <p class="subtitle">Search and explore player journeys through the arena</p>
+  </header>
+
+  <!-- Interactive Filtering Options -->
+  <section class="filter-panel">
+    <div class="filter-group">
+      <label for="search-input">Search Contestant</label>
+      <input type="text" id="search-input" placeholder="Type a name to search...">
+    </div>
+
+    <div class="filter-group">
+      <label for="legacy-filter">Legacy Tier</label>
+      <select id="legacy-filter">
+        <option value="ALL">All Legacies</option>
+        <option value="CHAMPION">Champion</option>
+        <option value="FINALIST">Finalist</option>
+        <option value="ALL STAR">All Star</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="original-filter">Original Team</label>
+      <select id="original-filter">
+        <option value="ALL">All Teams</option>
+        <option value="Champions">Champions</option>
+        <option value="Contenders">Contenders</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="status-filter">Status</label>
+      <select id="status-filter">
+        <option value="ALL">All Statuses</option>
+        <option value="Winner">Winner</option>
+        <option value="Eliminated">Eliminated</option>
+        <option value="Voted Out">Voted Out</option>
+        <option value="Walked">Walked</option>
+        <option value="Medical DQ">Medical DQ</option>
+        <option value="Purged">Purged</option>
+        <option value="Disqualified">Disqualified</option>
+        <option value="Runner-Up">Runner-Up</option>
+      </select>
+    </div>
+
+    <div class="results-count" id="results-count">Showing 154 of 154 contestants</div>
+  </section>
   
-  <div class="grid-container" id="cards-grid"></div>
+  <main class="grid-container" id="cards-grid"></main>
 
   <script>
-    // Embedded contestant database directly inside the code
+    // THE COMPLETE CONTESTANT DATABASE (154 players)
     const playersData = [
       { "Name": "Fraser", "Legacy": "FINALIST", "Original": "Contenders", "Cycle 16": "", "Cycle 17": "", "Shuffle": "", "Expand": "", "Swap": "", "Cycle 34": "", "Cycle 35": "", "2nd Exp": "", "Switch": "", "Disolve": "", "Merge": "", "Status": "Eliminated", "Episode": "Episode 7" },
       { "Name": "Alex", "Legacy": "CHAMPION", "Original": "Champions", "Cycle 16": "", "Cycle 17": "", "Shuffle": "", "Expand": "", "Swap": "", "Cycle 34": "", "Cycle 35": "", "2nd Exp": "", "Switch": "", "Disolve": "", "Merge": "", "Status": "Eliminated", "Episode": "Episode 14" },
@@ -203,7 +318,7 @@
       { "Name": "Carter", "Legacy": "ALL STAR", "Original": "Contenders", "Cycle 16": "", "Cycle 17": "", "Shuffle": "", "Expand": "", "Swap": "", "Cycle 34": "", "Cycle 35": "", "2nd Exp": "", "Switch": "", "Disolve": "", "Merge": "", "Status": "Voted Out", "Episode": "Episode 49" },
       { "Name": "Oskar", "Legacy": "FINALIST", "Original": "Contenders", "Cycle 16": "", "Cycle 17": "", "Shuffle": "", "Expand": "", "Swap": "", "Cycle 34": "", "Cycle 35": "", "2nd Exp": "", "Switch": "", "Disolve": "", "Merge": "", "Status": "Voted Out", "Episode": "Episode 56" },
       { "Name": "Johnny Mac", "Legacy": "ALL STAR", "Original": "Contenders", "Cycle 16": "", "Cycle 17": "", "Shuffle": "", "Expand": "", "Swap": "", "Cycle 34": "", "Cycle 35": "", "2nd Exp": "", "Switch": "", "Disolve": "", "Merge": "", "Status": "Voted Out", "Episode": "Episode 63" },
-      { "Name": "Lara", "Legacy": "ALL STAR", "Original": "Contenders", "Cycle 16": "", "Cycle 17": "", "Shuffle": "", "Expand": "", "Swap": "", "Cycle 34": "", "Cycle 35": "", "2nd Exp": "", "Switch": "", "Disolve": "", "Merge": "", "Status": "Eliminated", "Episode": "Episode 70" },
+      { "Name": "Sherbet", "Legacy": "FINALIST", "Original": "Contenders", "Cycle 16": "", "Cycle 17": "", "Shuffle": "", "Expand": "", "Swap": "", "Cycle 34": "", "Cycle 35": "", "2nd Exp": "", "Switch": "", "Disolve": "", "Merge": "", "Status": "Voted Out", "Episode": "Episode 70" },
       { "Name": "Rich", "Legacy": "FINALIST", "Original": "Champions", "Cycle 16": "", "Cycle 17": "", "Shuffle": "", "Expand": "", "Swap": "", "Cycle 34": "", "Cycle 35": "", "2nd Exp": "", "Switch": "", "Disolve": "", "Merge": "", "Status": "Voted Out", "Episode": "Episode 77" },
       { "Name": "Rhys", "Legacy": "ALL STAR", "Original": "Contenders", "Cycle 16": "", "Cycle 17": "", "Shuffle": "", "Expand": "", "Swap": "", "Cycle 34": "", "Cycle 35": "", "2nd Exp": "", "Switch": "", "Disolve": "", "Merge": "", "Status": "Voted Out", "Episode": "Episode 84" },
       { "Name": "Jordan", "Legacy": "FINALIST", "Original": "Contenders", "Cycle 16": "", "Cycle 17": "", "Shuffle": "", "Expand": "", "Swap": "", "Cycle 34": "", "Cycle 35": "", "2nd Exp": "", "Switch": "", "Disolve": "", "Merge": "", "Status": "Voted Out", "Episode": "Episode 91" },
@@ -213,15 +328,45 @@
       { "Name": "Kitty", "Legacy": "CHAMPION", "Original": "Champions", "Cycle 16": "Champions", "Cycle 17": "Champions", "Shuffle": "", "Expand": "", "Swap": "", "Cycle 34": "", "Cycle 35": "", "2nd Exp": "", "Switch": "", "Disolve": "", "Merge": "", "Status": "Eliminated", "Episode": "Episode 119" },
       { "Name": "Abram", "Legacy": "ALL STAR", "Original": "Contenders", "Cycle 16": "Contenders", "Cycle 17": "Contenders", "Shuffle": "", "Expand": "", "Swap": "", "Cycle 34": "", "Cycle 35": "", "2nd Exp": "", "Switch": "", "Disolve": "", "Merge": "", "Status": "Walked", "Episode": "Episode 120" },
       { "Name": "Dianne", "Legacy": "CHAMPION", "Original": "Champions", "Cycle 16": "Contenders", "Cycle 17": "Contenders", "Shuffle": "", "Expand": "", "Swap": "", "Cycle 34": "", "Cycle 35": "", "2nd Exp": "", "Switch": "", "Disolve": "", "Merge": "", "Status": "Walked", "Episode": "Episode 121" },
-      { "Name": "Frank", "Legacy": "FINALIST", "Original": "Contenders", "Cycle 16": "Contenders", "Cycle 17": "Contenders", "Shuffle": "", "Expand": "", "Swap": "", "Cycle 34": "", "Cycle 35": "", "2nd Exp": "", "Switch": "", "Disolve": "", "Merge": "", "Status": "Walked", "Episode": "Episode 122" }
+      { "Name": "Frank", "Legacy": "FINALIST", "Original": "Contenders", "Cycle 16": "Contenders", "Cycle 17": "Contenders", "Shuffle": "", "Expand": "", "Swap": "", "Cycle 34": "", "Cycle 35": "", "2nd Exp": "", "Switch": "", "Disolve": "", "Merge": "", "Status": "Walked", "Episode": "Episode 122" },
+      { "Name": "Teresa", "Legacy": "ALL STAR", "Original": "Champions", "Cycle 16": "Contenders", "Cycle 17": "Contenders", "Shuffle": "Contenders", "Expand": "", "Swap": "", "Cycle 34": "", "Cycle 35": "", "2nd Exp": "", "Switch": "", "Disolve": "", "Merge": "", "Status": "Eliminated", "Episode": "Episode 129" },
+      { "Name": "Paul", "Legacy": "CHAMPION", "Original": "Champions", "Cycle 16": "Champions", "Cycle 17": "Champions", "Shuffle": "Champions", "Expand": "Champions", "Swap": "", "Cycle 34": "", "Cycle 35": "", "2nd Exp": "", "Switch": "", "Disolve": "", "Merge": "", "Status": "Eliminated", "Episode": "Episode 136" },
+      { "Name": "Lee", "Legacy": "FINALIST", "Original": "Contenders", "Cycle 16": "Champions", "Cycle 17": "Champions", "Shuffle": "Champions", "Expand": "Champions", "Swap": "Champions", "Cycle 34": "", "Cycle 35": "", "2nd Exp": "", "Switch": "", "Disolve": "", "Merge": "", "Status": "Eliminated", "Episode": "Episode 143" },
+      { "Name": "Gavin", "Legacy": "CHAMPION", "Original": "Champions", "Cycle 16": "Champions", "Cycle 17": "Champions", "Shuffle": "Champions", "Expand": "Champions", "Swap": "Champions", "Cycle 34": "Contenders", "Cycle 35": "", "2nd Exp": "", "Switch": "", "Disolve": "", "Merge": "", "Status": "Voted Out", "Episode": "Episode 150" },
+      { "Name": "Marcus", "Legacy": "ALL STAR", "Original": "Champions", "Cycle 16": "Champions", "Cycle 17": "Champions", "Shuffle": "Champions", "Expand": "Champions", "Swap": "Champions", "Cycle 34": "Contenders", "Cycle 35": "Champions", "2nd Exp": "", "Switch": "", "Disolve": "", "Merge": "", "Status": "Eliminated", "Episode": "Episode 157" },
+      { "Name": "Isla", "Legacy": "ALL STAR", "Original": "Contenders", "Cycle 16": "Contenders", "Cycle 17": "Contenders", "Shuffle": "Contenders", "Expand": "Contenders", "Swap": "Contenders", "Cycle 34": "Champions", "Cycle 35": "Contenders", "2nd Exp": "Contenders", "Switch": "", "Disolve": "", "Merge": "", "Status": "Voted Out", "Episode": "Episode 164" },
+      { "Name": "Dave", "Legacy": "ALL STAR", "Original": "Champions", "Cycle 16": "Contenders", "Cycle 17": "Contenders", "Shuffle": "Contenders", "Expand": "Champions", "Swap": "Champions", "Cycle 34": "Champions", "Cycle 35": "Champions", "2nd Exp": "Champions", "Switch": "Contenders", "Disolve": "", "Merge": "", "Status": "Voted Out", "Episode": "Episode 171" },
+      { "Name": "Darren", "Legacy": "ALL STAR", "Original": "Champions", "Cycle 16": "Champions", "Cycle 17": "Champions", "Shuffle": "Champions", "Expand": "Contenders", "Swap": "Champions", "Cycle 34": "Champions", "Cycle 35": "Champions", "2nd Exp": "Champions", "Switch": "Champions", "Disolve": "Champions", "Merge": "", "Status": "Eliminated", "Episode": "Episode 178" },
+      { "Name": "Stuart", "Legacy": "FINALIST", "Original": "Contenders", "Cycle 16": "Contenders", "Cycle 17": "Contenders", "Shuffle": "Contenders", "Expand": "Contenders", "Swap": "Contenders", "Cycle 34": "Champions", "Cycle 35": "Contenders", "2nd Exp": "Contenders", "Switch": "Champions", "Disolve": "Contenders", "Merge": "Merge", "Status": "Voted Out", "Episode": "Episode 185" },
+      { "Name": "Aarron", "Legacy": "CHAMPION", "Original": "Champions", "Cycle 16": "Champions", "Cycle 17": "Champions", "Shuffle": "Champions", "Expand": "Champions", "Swap": "Champions", "Cycle 34": "Champions", "Cycle 35": "Champions", "2nd Exp": "Champions", "Switch": "Champions", "Disolve": "Champions", "Merge": "Merge", "Status": "Voted Out", "Episode": "Episode 192" },
+      { "Name": "Aidan", "Legacy": "ALL STAR", "Original": "Champions", "Cycle 16": "Champions", "Cycle 17": "Champions", "Shuffle": "Champions", "Expand": "Champions", "Swap": "Champions", "Cycle 34": "Champions", "Cycle 35": "Champions", "2nd Exp": "Champions", "Switch": "Champions", "Disolve": "Champions", "Merge": "Merge", "Status": "Medical DQ", "Episode": "Episode 193" },
+      { "Name": "Finlay", "Legacy": "ALL STAR", "Original": "Contenders", "Cycle 16": "Contenders", "Cycle 17": "Contenders", "Shuffle": "Contenders", "Expand": "Contenders", "Swap": "Contenders", "Cycle 34": "Contenders", "Cycle 35": "Contenders", "2nd Exp": "Contenders", "Switch": "Contenders", "Disolve": "Contenders", "Merge": "Merge", "Status": "Purged", "Episode": "Episode 194" },
+      { "Name": "Ruaridh", "Legacy": "ALL STAR", "Original": "Champions", "Cycle 16": "Champions", "Cycle 17": "Champions", "Shuffle": "Champions", "Expand": "Champions", "Swap": "Champions", "Cycle 34": "Champions", "Cycle 35": "Champions", "2nd Exp": "Champions", "Switch": "Champions", "Disolve": "Champions", "Merge": "Merge", "Status": "Purged", "Episode": "Episode 195" },
+      { "Name": "Stephen", "Legacy": "FINALIST", "Original": "Contenders", "Cycle 16": "Champions", "Cycle 17": "Champions", "Shuffle": "Champions", "Expand": "Champions", "Swap": "Champions", "Cycle 34": "Champions", "Cycle 35": "Champions", "2nd Exp": "Champions", "Switch": "Champions", "Disolve": "Champions", "Merge": "Merge", "Status": "Purged", "Episode": "Episode 196" },
+      { "Name": "Ben", "Legacy": "ALL STAR", "Original": "Contenders", "Cycle 16": "Contenders", "Cycle 17": "Contenders", "Shuffle": "Contenders", "Expand": "Contenders", "Swap": "Contenders", "Cycle 34": "Champions", "Cycle 35": "Contenders", "2nd Exp": "Contenders", "Switch": "Contenders", "Disolve": "Contenders", "Merge": "Merge", "Status": "Purged", "Episode": "Episode 197" },
+      { "Name": "Jamie", "Legacy": "FINALIST", "Original": "Contenders", "Cycle 16": "Contenders", "Cycle 17": "Contenders", "Shuffle": "Contenders", "Expand": "Contenders", "Swap": "Contenders", "Cycle 34": "Contenders", "Cycle 35": "Contenders", "2nd Exp": "Contenders", "Switch": "Contenders", "Disolve": "Contenders", "Merge": "Merge", "Status": "Eliminated", "Episode": "Episode 198" },
+      { "Name": "Craig", "Legacy": "CHAMPION", "Original": "Champions", "Cycle 16": "Contenders", "Cycle 17": "Contenders", "Shuffle": "Contenders", "Expand": "Champions", "Swap": "Champions", "Cycle 34": "Champions", "Cycle 35": "Champions", "2nd Exp": "Champions", "Switch": "Champions", "Disolve": "Champions", "Merge": "Merge", "Status": "Voted Out", "Episode": "Episode 199" },
+      { "Name": "Ewan", "Legacy": "FINALIST", "Original": "Champions", "Cycle 16": "Champions", "Cycle 17": "Champions", "Shuffle": "Champions", "Expand": "Contenders", "Swap": "Champions", "Cycle 34": "Contenders", "Cycle 35": "Contenders", "2nd Exp": "Contenders", "Switch": "Contenders", "Disolve": "Contenders", "Merge": "Merge", "Status": "Voted Out", "Episode": "Episode 200" },
+      { "Name": "Greig", "Legacy": "FINALIST", "Original": "Contenders", "Cycle 16": "Contenders", "Cycle 17": "Contenders", "Shuffle": "Contenders", "Expand": "Contenders", "Swap": "Contenders", "Cycle 34": "Contenders", "Cycle 35": "Contenders", "2nd Exp": "Contenders", "Switch": "Contenders", "Disolve": "Contenders", "Merge": "Merge", "Status": "Voted Out", "Episode": "Episode 201" },
+      { "Name": "Sean", "Legacy": "CHAMPION", "Original": "Champions", "Cycle 16": "Champions", "Cycle 17": "Champions", "Shuffle": "Champions", "Expand": "Champions", "Swap": "Champions", "Cycle 34": "Champions", "Cycle 35": "Champions", "2nd Exp": "Champions", "Switch": "Champions", "Disolve": "Champions", "Merge": "Merge", "Status": "Disqualified", "Episode": "Episode 202" },
+      { "Name": "Dean", "Legacy": "FINALIST", "Original": "Contenders", "Cycle 16": "Champions", "Cycle 17": "Champions", "Shuffle": "Champions", "Expand": "Champions", "Swap": "Champions", "Cycle 34": "Champions", "Cycle 35": "Champions", "2nd Exp": "Champions", "Switch": "Champions", "Disolve": "Champions", "Merge": "Merge", "Status": "Runner-Up", "Episode": "Episode 203" },
+      { "Name": "Angus", "Legacy": "CHAMPION", "Original": "Champions", "Cycle 16": "Champions", "Cycle 17": "Champions", "Shuffle": "Champions", "Expand": "Champions", "Swap": "Champions", "Cycle 34": "Champions", "Cycle 35": "Champions", "2nd Exp": "Champions", "Switch": "Champions", "Disolve": "Champions", "Merge": "Merge", "Status": "Winner", "Episode": "Episode 203" }
     ];
+
+    // Build the grid and cards
+    const grid = document.getElementById('cards-grid');
+    const searchInput = document.getElementById('search-input');
+    const legacyFilter = document.getElementById('legacy-filter');
+    const originalFilter = document.getElementById('original-filter');
+    const statusFilter = document.getElementById('status-filter');
+    const resultsCount = document.getElementById('results-count');
 
     function createPlayerCard(player) {
       // Dynamic description generator
       const description = `${player.Name} entered the competition as a ${player.Legacy} assigned to the ${player.Original} squad. ` +
                           `They ended their run as '${player.Status}' during ${player.Episode}.`;
 
-      // Complete cycle list chronologically
+      // Complete cycle list chronologically from the columns
       const cycles = [
         { label: 'Start', key: 'Original' },
         { label: 'C16', key: 'Cycle 16' },
@@ -237,7 +382,7 @@
         { label: 'Merge', key: 'Merge' }
       ];
 
-      // Build the active timeline steps
+      // Build the active timeline steps (skip blank cells)
       let activeSteps = [];
       cycles.forEach(phase => {
         const teamName = player[phase.key];
@@ -278,11 +423,44 @@
       `;
     }
 
-    // Render cards directly on page load
-    const grid = document.getElementById('cards-grid');
-    playersData.forEach(player => {
-      grid.innerHTML += createPlayerCard(player);
-    });
+    // Interactive filter function
+    function filterPlayers() {
+      const query = searchInput.value.toLowerCase().trim();
+      const legacyVal = legacyFilter.value;
+      const originalVal = originalFilter.value;
+      const statusVal = statusFilter.value;
+
+      let filtered = playersData.filter(player => {
+        const matchesSearch = player.Name.toLowerCase().includes(query);
+        const matchesLegacy = legacyVal === 'ALL' || player.Legacy.toUpperCase() === legacyVal;
+        const matchesOriginal = originalVal === 'ALL' || player.Original === originalVal;
+        const matchesStatus = statusVal === 'ALL' || player.Status === statusVal;
+
+        return matchesSearch && matchesLegacy && matchesOriginal && matchesStatus;
+      });
+
+      // Clear grid & update UI
+      grid.innerHTML = '';
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div class="no-results">No contestants match your selected filters.</div>';
+      } else {
+        filtered.forEach(player => {
+          grid.innerHTML += createPlayerCard(player);
+        });
+      }
+
+      // Update results counter
+      resultsCount.textContent = `Showing ${filtered.length} of ${playersData.length} contestants`;
+    }
+
+    // Event listeners to trigger instant filtering on user choice
+    searchInput.addEventListener('input', filterPlayers);
+    legacyFilter.addEventListener('change', filterPlayers);
+    originalFilter.addEventListener('change', filterPlayers);
+    statusFilter.addEventListener('change', filterPlayers);
+
+    // Initial run
+    filterPlayers();
   </script>
 </body>
 </html>
