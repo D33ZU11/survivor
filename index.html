@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elementus: The Inferno // Player Database</title>
+    <style>
+        :root {
+            --bg-color: #121214;
+            --card-bg: #1e1e24;
+            --accent-color: #ff4a4a;
+            --text-main: #ffffff;
+            --text-muted: #a0a0b0;
+            --win-color: #4caf50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-main);
+        }
+
+        .subtitle {
+            color: var(--accent-color);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+
+        .controls {
+            margin-bottom: 30px;
+        }
+
+        select {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border: 2px solid #333;
+            padding: 12px 20px;
+            font-size: 1rem;
+            border-radius: 8px;
+            width: 100%;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        select:focus {
+            border-color: var(--accent-color);
+        }
+
+        /* Player Card Styling */
+        .player-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            padding: 30px;
+            border-top: 5px solid var(--accent-color);
+            transition: transform 0.3s ease;
+            display: none; /* Hidden until a player is picked */
+        }
+
+        .player-name {
+            font-size: 2rem;
+            font-weight: 8xl;
+            margin: 0 0 5px 0;
+        }
+
+        .player-status {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--win-color);
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-val {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--text-main);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-top: 5px;
+            display: block;
+            letter-spacing: 1px;
+        }
+
+        .footer-note {
+            margin-top: 40px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>ELEMENTUS</h1>
+        <div class="subtitle">The Inferno // Season 15</div>
+
+        <div class="controls">
+            <select id="playerSelect" onchange="updatePlayerCard()">
+                <option value="" disabled selected>Select a Contestant...</option>
+                <!-- Real data pulled directly from his system -->
+                <option value="michael">Michael T</option>
+                <option value="lisa">Lisa</option>
+                <option value="kit">Kit</option>
+                <option value="kellyanne">Kellyanne</option>
+                <option value="hunter">Hunter</option>
+                <option value="chane">Chané</option>
+            </select>
+        </div>
+
+        <div class="player-card" id="playerCard">
+            <div class="player-name" id="cardName">Player Name</div>
+            <div class="player-status" id="cardStatus">STATUS</div>
+            
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <span class="stat-val" id="cardWins">0</span>
+                    <span class="stat-label">Total Wins</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-val" id="cardNoms">0</span>
+                    <span class="stat-label">Nominations</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-val" id="cardInfernos">0</span>
+                    <span class="stat-label">Infernos</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-note">
+            Data verified directly from the Master Production File.
+        </div>
+    </div>
+
+    <script>
+        // Real data extracted from his actual spreadsheet breakdown
+        const playerData = {
+            michael: { name: "Michael T", wins: 49, noms: 9, infernos: 2, status: "👑 Conqueror / Winner" },
+            lisa: { name: "Lisa", wins: 34, noms: 13, infernos: 0, status: "👑 Conqueror / Winner" },
+            kit: { name: "Kit", wins: 49, noms: 11, infernos: 0, status: "👑 Conqueror / Winner" },
+            kellyanne: { name: "Kellyanne", wins: 46, noms: 12, infernos: 1, status: "👑 Conqueror / Winner" },
+            hunter: { name: "Hunter", wins: 45, noms: 13, infernos: 0, status: "👑 Conqueror / Winner" },
+            chane: { name: "Chané", wins: 29, noms: 17, infernos: 2, status: "👑 Conqueror / Winner" }
+        };
+
+        function updatePlayerCard() {
+            const select = document.getElementById('playerSelect');
+            const selectedCard = document.getElementById('playerCard');
+            const pKey = select.value;
+
+            if (playerData[pKey]) {
+                document.getElementById('cardName').innerText = playerData[pKey].name;
+                document.getElementById('cardStatus').innerText = playerData[pKey].status;
+                document.getElementById('cardWins').innerText = playerData[pKey].wins;
+                document.getElementById('cardNoms').innerText = playerData[pKey].noms;
+                document.getElementById('cardInfernos').innerText = playerData[pKey].infernos;
+                
+                // Reveal the card with style
+                selectedCard.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
