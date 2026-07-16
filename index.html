@@ -18,10 +18,11 @@
       margin: 0;
       padding: 0;
       overflow-x: hidden;
+      user-select: none;
     }
 
     /* ==========================================
-       2. INTERACTIVE LANDING SCREEN (TORCH CHALLENGE)
+       2. INTERACTIVE LANDING SCREEN (BOULDER SMASH)
        ========================================== */
     #landing-screen {
       position: fixed;
@@ -29,126 +30,188 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: radial-gradient(circle, #1a0a0a 0%, #050505 100%);
+      background: radial-gradient(circle, #1a0d0d 0%, #070707 100%);
       z-index: 9999;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      transition: opacity 1s ease, visibility 1s ease;
+      overflow: hidden;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
     }
 
-    /* Animated Title */
-    .title-container h1 {
-      font-size: 3rem;
-      margin: 0 0 10px 0;
-      color: #fff;
-      text-transform: uppercase;
-      letter-spacing: 4px;
-      text-align: center;
-      animation: glow 2s ease-in-out infinite alternate;
+    /* Container for shatter physics */
+    #boulder-container {
+      position: relative;
+      width: 600px;
+      height: 250px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
-    @keyframes glow {
-      from { text-shadow: 0 0 10px #ff4a4a, 0 0 20px #ff4a4a; }
-      to { text-shadow: 0 0 20px #ff8000, 0 0 30px #ff8000; }
-    }
-
-    .title-container p {
-      color: #888;
-      font-size: 1.1rem;
-      text-align: center;
-      margin-bottom: 50px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-    }
-
-    /* Interactive Torch Element */
-    .torch-interaction {
+    /* Giant Stone Boulder */
+    .stone-boulder {
+      position: absolute;
+      width: 550px;
+      height: 200px;
+      background: radial-gradient(circle at 30% 30%, #444, #222 80%);
+      border-radius: 120px 90px 140px 100px;
+      box-shadow: inset -10px -10px 30px #111, 0 15px 35px rgba(0,0,0,0.8);
       display: flex;
       flex-direction: column;
+      justify-content: center;
       align-items: center;
-      cursor: pointer;
-    }
-
-    .torch-base {
-      width: 30px;
-      height: 120px;
-      background: linear-gradient(to right, #444, #222, #444);
-      border-radius: 5px;
-      position: relative;
-      border: 2px solid #555;
-    }
-
-    .torch-top {
-      width: 50px;
-      height: 25px;
-      background: #333;
-      border-radius: 4px 4px 0 0;
-      margin-bottom: -5px;
-      border: 2px solid #555;
-    }
-
-    /* Interactive Match / Sparker */
-    .matchstick {
-      width: 10px;
-      height: 70px;
-      background: #d7a15c;
-      border-radius: 2px;
-      position: absolute;
-      transform: rotate(45deg);
-      top: 130px;
-      cursor: grab;
+      border: 3px solid #2d2d2d;
+      z-index: 10;
+      transform-origin: center;
       transition: transform 0.1s;
     }
 
-    .match-tip {
-      width: 14px;
-      height: 14px;
-      background: #ff4a4a;
-      border-radius: 50%;
+    /* Cracked textures on boulder */
+    .stone-boulder::before {
+      content: '';
       position: absolute;
-      top: -10px;
-      left: -2px;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: 
+        linear-gradient(45deg, transparent 48%, #111 49%, #111 51%, transparent 52%),
+        linear-gradient(-45deg, transparent 45%, #111 47%, #111 49%, transparent 51%);
+      background-size: 80px 80px;
+      opacity: 0.4;
+      pointer-events: none;
+      border-radius: inherit;
     }
 
-    /* Flame Animation */
-    .flame {
-      width: 40px;
-      height: 60px;
-      background: radial-gradient(circle at bottom, #ffea00 0%, #ff5e00 60%, transparent 100%);
-      border-radius: 50% 50% 20% 20%;
+    /* Molten glowing text inside boulder */
+    .stone-boulder h1 {
+      font-size: 3.2rem;
+      margin: 0;
+      color: #ff3c00;
+      text-transform: uppercase;
+      letter-spacing: 5px;
+      text-shadow: 0 0 10px #ff3c00, 0 0 25px #ff8000;
+      font-weight: 900;
+      text-align: center;
+      animation: pulseGlow 2s infinite alternate;
+    }
+
+    @keyframes pulseGlow {
+      from { text-shadow: 0 0 10px #ff3c00, 0 0 20px #ff6a00; opacity: 0.9; }
+      to { text-shadow: 0 0 20px #ff3c00, 0 0 35px #ff3c00, 0 0 5px #fff; opacity: 1; }
+    }
+
+    .stone-boulder p {
+      color: #aaa;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin: 5px 0 0 0;
+      font-weight: bold;
+    }
+
+    /* Battering Ram Structure */
+    .gallows {
       position: absolute;
-      top: -55px;
-      left: 5px;
-      transform-origin: bottom center;
-      transform: scale(0);
-      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      animation: flicker 0.1s infinite alternate;
+      bottom: 80px;
+      width: 400px;
+      height: 250px;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
     }
 
-    @keyframes flicker {
-      0% { transform: scale(1) rotate(-1deg); }
-      100% { transform: scale(1.05) rotate(1deg); }
+    /* The swinging weapon */
+    .ram-container {
+      position: absolute;
+      top: 0;
+      width: 140px;
+      height: 220px;
+      transform-origin: top center;
+      animation: gentleSway 4s ease-in-out infinite alternate;
+      pointer-events: auto;
+      cursor: grab;
     }
 
-    .challenge-text {
+    .ram-container:active {
+      cursor: grabbing;
+    }
+
+    /* Ropes holding the ram */
+    .rope {
+      position: absolute;
+      width: 3px;
+      height: 140px;
+      background: #8b5a2b;
+      top: 0;
+    }
+    .rope-left { left: 40px; transform: rotate(5deg); transform-origin: top center; }
+    .rope-right { right: 40px; transform: rotate(-5deg); transform-origin: top center; }
+
+    /* Wooden Log Ram */
+    .wooden-ram {
+      position: absolute;
+      bottom: 15px;
+      left: 10px;
+      width: 120px;
+      height: 55px;
+      background: linear-gradient(to bottom, #5c3a21, #362213, #1f130a);
+      border-radius: 12px;
+      border: 2px solid #2d1a0c;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.6);
+    }
+
+    /* Iron bands & spike on ram front */
+    .wooden-ram::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 30px; bottom: 0; width: 10px;
+      background: #444; border-left: 1px solid #666; border-right: 1px solid #222;
+    }
+    .wooden-ram::after {
+      content: '';
+      position: absolute;
+      top: 15px; right: -15px;
+      width: 0; height: 0;
+      border-top: 12px solid transparent;
+      border-bottom: 12px solid transparent;
+      border-left: 18px solid #555;
+    }
+
+    @keyframes gentleSway {
+      0% { transform: rotate(-3deg); }
+      100% { transform: rotate(3deg); }
+    }
+
+    /* Interaction Instructions */
+    .challenge-prompt {
+      position: absolute;
+      bottom: 40px;
       color: #ff9d00;
-      font-size: 0.9rem;
-      margin-top: 20px;
+      font-size: 1rem;
       text-transform: uppercase;
       font-weight: bold;
-      letter-spacing: 1px;
-      animation: pulse 1.5s infinite;
+      letter-spacing: 2px;
+      animation: pulseText 1.5s infinite;
+      text-align: center;
     }
 
-    @keyframes pulse {
-      0% { opacity: 0.6; }
-      50% { opacity: 1; }
-      100% { opacity: 0.6; }
+    @keyframes pulseText {
+      0% { opacity: 0.5; transform: scale(0.98); }
+      50% { opacity: 1; transform: scale(1.02); }
+      100% { opacity: 0.5; transform: scale(0.98); }
     }
 
-    /* Screen Burn/Fade transition */
+    /* Shattered rock particles spawned by JS */
+    .stone-shard {
+      position: absolute;
+      background: #333;
+      border: 1px solid #111;
+      pointer-events: none;
+      z-index: 15;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.8);
+    }
+
+    /* Transition classes */
     #landing-screen.fade-out {
       opacity: 0;
       visibility: hidden;
@@ -163,11 +226,13 @@
       margin: 0 auto;
       padding: 20px;
       opacity: 0;
-      transition: opacity 1s ease;
+      transform: scale(0.95);
+      transition: opacity 1s cubic-bezier(0.075, 0.82, 0.165, 1), transform 1s cubic-bezier(0.075, 0.82, 0.165, 1);
     }
 
     #main-app.visible {
       opacity: 1;
+      transform: scale(1);
     }
 
     header {
@@ -379,12 +444,12 @@
       white-space: nowrap;
     }
 
-    /* Team Highlight Colors (Customize as needed) */
+    /* Team Highlight Colors */
     .team-contenders { border-color: #3498db; color: #3498db; }
     .team-champions { border-color: #f1c40f; color: #f1c40f; }
     .team-merge { border-color: #9b59b6; color: #9b59b6; }
     .team-heroes { border-color: #e74c3c; color: #e74c3c; }
-    .team-mokuta { border-color: #2ecc71; color: #2ecc7 green; }
+    .team-mokuta { border-color: #2ecc71; color: #2ecc71; }
     .team-vuna { border-color: #e67e22; color: #e67e22; }
     .team-vuur { border-color: #e25822; color: #e25822; }
 
@@ -409,22 +474,26 @@
 <body>
 
   <!-- ==========================================
-       LANDING SCREEN (INTERACTIVE TORCH CHALLENGE)
+       LANDING SCREEN (INTERACTIVE BOULDER SMASH)
        ========================================== -->
   <div id="landing-screen">
-    <div class="title-container">
-      <h1>Elementus: The Inferno</h1>
-      <p>Journey Database Map</p>
+    <div id="boulder-container">
+      <div class="stone-boulder" id="boulder">
+        <h1>Elementus</h1>
+        <p>The Inferno</p>
+      </div>
     </div>
 
-    <!-- Interactive Torch Area -->
-    <div class="torch-interaction" id="torch-interactive-zone" onclick="lightTorch()">
-      <div class="torch-top">
-        <div class="flame" id="torch-flame"></div>
+    <!-- Gallows frame with interactive suspended battering ram -->
+    <div class="gallows">
+      <div class="ram-container" id="ram" style="transform: rotate(0deg);">
+        <div class="rope rope-left"></div>
+        <div class="rope rope-right"></div>
+        <div class="wooden-ram"></div>
       </div>
-      <div class="torch-base"></div>
-      <div class="challenge-text" id="prompt-text">Tap the Torch to Light It & Enter</div>
     </div>
+
+    <div class="challenge-prompt" id="prompt-text">Drag Ram Back & Release to Smash!</div>
   </div>
 
   <!-- ==========================================
@@ -541,7 +610,6 @@
       {"Name": "Ollie", "Legacy": "ALL STAR", "Original": "Champions", "Cycle 16": "Champions", "Cycle 17": "Champions", "Shuffle": "Contenders", "Expand": "Contenders", "Swap": "Contenders", "Cycle 34": "Contenders", "Cycle 35": "Contenders", "2nd Exp": "Heroes", "Switch": "Heroes", "Disolve": "Vuna", "Merge": "Vuur", "Status": "Voted Out", "Episode": "Episode 371"},
       {"Name": "Tyler", "Legacy": "ALL STAR", "Original": "Champions", "Cycle 16": "Champions", "Cycle 17": "Champions", "Shuffle": "Contenders", "Expand": "Contenders", "Swap": "Contenders", "Cycle 34": "Contenders", "Cycle 35": "Contenders", "2nd Exp": "Heroes", "Switch": "Heroes", "Disolve": "Vuna", "Merge": "Vuur", "Status": "Eliminated", "Episode": "Episode 378"},
       {"Name": "Jordan T", "Legacy": "ALL STAR", "Original": "Contenders", "Cycle 16": "Contenders", "Cycle 17": "Contenders", "Shuffle": "Champions", "Expand": "Champions", "Swap": "Heroes", "Cycle 34": "Heroes", "Cycle 35": "Heroes", "2nd Exp": "Heroes", "Switch": "Heroes", "Disolve": "Vuna", "Merge": "Vuur", "Status": "Voted Out", "Episode": "Episode 385"},
-      {"Name": "Kofi", "Legacy": "CHAMPION", "Original": "Champions", "Cycle 16": "Champions", "Cycle 17": "Champions", "Shuffle": "Champions", "Expand": "Champions", "Swap": "Heroes", "Cycle 34": "Heroes", "Cycle 35": "Heroes", "2nd Exp": "Heroes", "Switch": "Heroes", "Disolve": "Vuna", "Merge": "Vuur", "Status": "Voted Out", "Episode": "Episode 392"},
       {"Name": "Rudy", "Legacy": "ALL STAR", "Original": "Champions", "Cycle 16": "Champions", "Cycle 17": "Champions", "Shuffle": "Champions", "Expand": "Champions", "Swap": "Heroes", "Cycle 34": "Heroes", "Cycle 35": "Heroes", "2nd Exp": "Heroes", "Switch": "Heroes", "Disolve": "Vuna", "Merge": "Vuur", "Status": "Medical DQ", "Episode": "Episode 393"},
       {"Name": "Ayrton", "Legacy": "ALL STAR", "Original": "Contenders", "Cycle 16": "Contenders", "Cycle 17": "Contenders", "Shuffle": "Contenders", "Expand": "Contenders", "Swap": "Contenders", "Cycle 34": "Contenders", "Cycle 35": "Contenders", "2nd Exp": "Heroes", "Switch": "Heroes", "Disolve": "Vuna", "Merge": "Vuur", "Status": "Purged", "Episode": "Episode 394"},
       {"Name": "Ewan G", "Legacy": "ALL STAR", "Original": "Champions", "Cycle 16": "Champions", "Cycle 17": "Champions", "Shuffle": "Champions", "Expand": "Champions", "Swap": "Heroes", "Cycle 34": "Heroes", "Cycle 35": "Heroes", "2nd Exp": "Heroes", "Switch": "Heroes", "Disolve": "Vuna", "Merge": "Vuur", "Status": "Purged", "Episode": "Episode 395"},
@@ -607,23 +675,141 @@
       {"Name": "Michael T", "Legacy": "CHAMPION", "Original": "Champions", "Cycle 16": "Contenders", "Cycle 17": "Contenders", "Shuffle": "Contenders", "Expand": "Contenders", "Swap": "Contenders", "Cycle 34": "Champions", "Cycle 35": "Champions", "2nd Exp": "Heroes", "Switch": "Heroes", "Disolve": "Vuna", "Merge": "Vuur", "Status": "Winner", "Episode": "Episode 441"}
     ];
 
-    // Landing screen interaction code
-    function lightTorch() {
-      const flame = document.getElementById('torch-flame');
-      const prompt = document.getElementById('prompt-text');
-      const landing = document.getElementById('landing-screen');
-      const app = document.getElementById('main-app');
+    // ==========================================
+    // PHYSICS-BASED BATTERING RAM / BOULDER ENGINE
+    // ==========================================
+    const ram = document.getElementById('ram');
+    const boulder = document.getElementById('boulder');
+    const promptText = document.getElementById('prompt-text');
+    const landing = document.getElementById('landing-screen');
+    const app = document.getElementById('main-app');
 
-      // 1. Light the flame instantly
-      flame.style.transform = 'scale(1)';
-      prompt.textContent = "Flame Lit! Entering Arena...";
-      prompt.style.color = "#ff4a4a";
+    let isDragging = false;
+    let startX = 0;
+    let currentAngle = 0;
 
-      // 2. Trigger the dissolve/burn effect
+    // Handle Dragging / Pulling back the Ram
+    function startDrag(e) {
+      isDragging = true;
+      startX = e.clientX || e.touches[0].clientX;
+      ram.style.animation = 'none'; // Stop standard idle sway
+    }
+
+    function doDrag(e) {
+      if (!isDragging) return;
+      const x = e.clientX || (e.touches && e.touches[0].clientX);
+      const deltaX = x - startX;
+      
+      // Calculate angle of drawback (limit to left swing back -35 degrees to prevent breaks)
+      currentAngle = Math.max(-35, Math.min(0, deltaX * 0.15));
+      ram.style.transform = `rotate(${currentAngle}deg)`;
+    }
+
+    function endDrag() {
+      if (!isDragging) return;
+      isDragging = false;
+
+      // If they pulled it back far enough, trigger the big hit
+      if (currentAngle < -10) {
+        promptText.textContent = "SMASHING!";
+        ram.style.transition = 'transform 0.18s cubic-bezier(0.25, 1, 0.5, 1)';
+        
+        // Ram swings violently forward to hit the stone (+5 degrees to pass through slightly)
+        ram.style.transform = 'rotate(8deg)';
+
+        // Handle impact
+        setTimeout(() => {
+          shatterBoulder();
+        }, 180);
+
+      } else {
+        // Not enough force, reset to idle sway
+        ram.style.transition = 'transform 0.5s ease';
+        ram.style.transform = 'rotate(0deg)';
+        setTimeout(() => {
+          ram.style.transition = '';
+          ram.style.animation = 'gentleSway 4s ease-in-out infinite alternate';
+        }, 500);
+      }
+    }
+
+    // Connect Drag Listeners
+    ram.addEventListener('mousedown', startDrag);
+    window.addEventListener('mousemove', doDrag);
+    window.addEventListener('mouseup', endDrag);
+
+    ram.addEventListener('touchstart', startDrag);
+    window.addEventListener('touchmove', doDrag);
+    window.addEventListener('touchend', endDrag);
+
+    // Shatter Boulder Particle Explosion Engine
+    function shatterBoulder() {
+      // Shake the screen slightly on hit
+      boulder.style.transform = 'scale(0.95) translate(15px, 0)';
+      
       setTimeout(() => {
-        landing.classList.add('fade-out');
-        app.classList.add('visible');
-      }, 1000);
+        const rect = boulder.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        // Spawn 45 custom stone debris fragments flying everywhere
+        for (let i = 0; i < 45; i++) {
+          const shard = document.createElement('div');
+          shard.classList.add('stone-shard');
+
+          // Generate sharp rocky triangles and squares of random shapes
+          const size = Math.random() * 40 + 20;
+          shard.style.width = `${size}px`;
+          shard.style.height = `${size}px`;
+          
+          // Flame glow borders on flying stones
+          shard.style.background = 'radial-gradient(circle, #444, #1c1c1c)';
+          shard.style.borderColor = Math.random() > 0.5 ? '#ff4a00' : '#111';
+          shard.style.borderRadius = `${Math.random() * 50}% ${Math.random() * 50}% ${Math.random() * 50}% ${Math.random() * 50}%`;
+          
+          shard.style.left = `${rect.left + Math.random() * rect.width}px`;
+          shard.style.top = `${rect.top + Math.random() * rect.height}px`;
+
+          landing.appendChild(shard);
+
+          // Calculate raw trajectory velocity
+          const angle = Math.random() * Math.PI * 2;
+          const force = Math.random() * 25 + 15;
+          const velX = Math.cos(angle) * force;
+          const velY = Math.sin(angle) * force;
+          let rot = Math.random() * 360;
+
+          // Animate particle drift physics
+          let tick = 0;
+          const particleTimer = setInterval(() => {
+            tick++;
+            const currentLeft = parseFloat(shard.style.left);
+            const currentTop = parseFloat(shard.style.top);
+            
+            shard.style.left = `${currentLeft + velX}px`;
+            shard.style.top = `${currentTop + velY + (tick * 0.4)}px`; // Apply a tiny bit of gravity drop
+            shard.style.transform = `rotate(${rot + tick * 5}deg)`;
+            shard.style.opacity = 1 - (tick / 50);
+
+            if (tick >= 50) {
+              clearInterval(particleTimer);
+              shard.remove();
+            }
+          }, 16);
+        }
+
+        // Hide the original boulder and ramp visual elements
+        boulder.style.display = 'none';
+        ram.style.display = 'none';
+        document.querySelector('.gallows').style.display = 'none';
+
+        // Gracefully fade the landing layout away to reveal the engine
+        setTimeout(() => {
+          landing.classList.add('fade-out');
+          app.classList.add('visible');
+        }, 600);
+
+      }, 80);
     }
 
     // Grid rendering and Search/Filter Engine
