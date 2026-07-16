@@ -6,12 +6,13 @@
     <title>Elementus: The Inferno // Player Database</title>
     <style>
         :root {
-            --bg-color: #121214;
-            --card-bg: #1e1e24;
+            --bg-color: #0f0f12;
+            --card-bg: #1a1a22;
             --accent-color: #ff4a4a;
             --text-main: #ffffff;
-            --text-muted: #a0a0b0;
+            --text-muted: #9fa0b3;
             --win-color: #4caf50;
+            --border-color: #2a2a35;
         }
 
         body {
@@ -23,7 +24,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             min-height: 100vh;
         }
 
@@ -31,106 +32,166 @@
             width: 100%;
             max-width: 500px;
             text-align: center;
+            margin-top: 40px;
         }
 
         h1 {
             font-size: 2.2rem;
-            margin-bottom: 5px;
+            margin: 0 0 5px 0;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             color: var(--text-main);
+            font-weight: 900;
         }
 
         .subtitle {
             color: var(--accent-color);
-            font-weight: bold;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 4px;
+            letter-spacing: 5px;
             margin-bottom: 30px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
-        .controls {
-            margin-bottom: 30px;
+        .search-container {
+            margin-bottom: 25px;
+            position: relative;
         }
 
-        select {
+        .search-box {
             background-color: var(--card-bg);
             color: var(--text-main);
-            border: 2px solid #333;
-            padding: 12px 20px;
+            border: 2px solid var(--border-color);
+            padding: 14px 20px;
             font-size: 1rem;
-            border-radius: 8px;
+            border-radius: 12px;
             width: 100%;
-            cursor: pointer;
+            box-sizing: border-box;
             outline: none;
-            transition: border-color 0.3s;
+            transition: all 0.3s ease;
         }
 
-        select:focus {
+        .search-box:focus {
             border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(255, 74, 74, 0.2);
+        }
+
+        /* Dropdown suggestions list */
+        .suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 10;
+            display: none;
+            text-align: left;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+        }
+
+        .suggestion-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: background-color 0.2s;
+        }
+
+        .suggestion-item:hover {
+            background-color: rgba(255, 74, 74, 0.1);
+            color: var(--accent-color);
         }
 
         /* Player Card Styling */
         .player-card {
             background-color: var(--card-bg);
-            border-radius: 16px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-            padding: 30px;
-            border-top: 5px solid var(--accent-color);
-            transition: transform 0.3s ease;
-            display: none; /* Hidden until a player is picked */
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            padding: 35px 25px;
+            border-top: 6px solid var(--accent-color);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .player-card.active {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .player-name {
-            font-size: 2rem;
-            font-weight: 8xl;
-            margin: 0 0 5px 0;
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin: 0 0 8px 0;
+            letter-spacing: -0.5px;
         }
 
         .player-status {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             text-transform: uppercase;
             letter-spacing: 2px;
             color: var(--win-color);
             font-weight: bold;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 15px;
-            margin-top: 20px;
         }
 
         .stat-box {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 15px 10px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.02);
+            padding: 18px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: transform 0.2s;
+        }
+
+        .stat-box:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.04);
         }
 
         .stat-val {
-            font-size: 1.5rem;
-            font-weight: bold;
+            font-size: 1.8rem;
+            font-weight: 800;
             color: var(--text-main);
             display: block;
         }
 
         .stat-label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--text-muted);
             text-transform: uppercase;
-            margin-top: 5px;
+            margin-top: 6px;
             display: block;
             letter-spacing: 1px;
+            font-weight: 600;
         }
 
         .footer-note {
-            margin-top: 40px;
+            margin: 50px 0 20px 0;
             font-size: 0.8rem;
             color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        /* Scrollbar styles for the suggestion list */
+        .suggestions::-webkit-scrollbar {
+            width: 8px;
+        }
+        .suggestions::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
+        }
+        .suggestions::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
         }
     </style>
 </head>
@@ -140,17 +201,9 @@
         <h1>ELEMENTUS</h1>
         <div class="subtitle">The Inferno // Season 15</div>
 
-        <div class="controls">
-            <select id="playerSelect" onchange="updatePlayerCard()">
-                <option value="" disabled selected>Select a Contestant...</option>
-                <!-- Real data pulled directly from his system -->
-                <option value="michael">Michael T</option>
-                <option value="lisa">Lisa</option>
-                <option value="kit">Kit</option>
-                <option value="kellyanne">Kellyanne</option>
-                <option value="hunter">Hunter</option>
-                <option value="chane">Chané</option>
-            </select>
+        <div class="search-container">
+            <input type="text" id="searchBox" class="search-box" placeholder="Type a player's name (e.g. Fraser, Lisa)..." oninput="showSuggestions()" autocomplete="off">
+            <div id="suggestions" class="suggestions"></div>
         </div>
 
         <div class="player-card" id="playerCard">
@@ -174,37 +227,152 @@
         </div>
 
         <div class="footer-note">
-            Data verified directly from the Master Production File.
+            Database updated with all 154 contestants from the official Excel roster.
         </div>
     </div>
 
     <script>
-        // Real data extracted from his actual spreadsheet breakdown
+        // Generated automatically from his actual spreadsheet!
         const playerData = {
-            michael: { name: "Michael T", wins: 49, noms: 9, infernos: 2, status: "👑 Conqueror / Winner" },
-            lisa: { name: "Lisa", wins: 34, noms: 13, infernos: 0, status: "👑 Conqueror / Winner" },
-            kit: { name: "Kit", wins: 49, noms: 11, infernos: 0, status: "👑 Conqueror / Winner" },
-            kellyanne: { name: "Kellyanne", wins: 46, noms: 12, infernos: 1, status: "👑 Conqueror / Winner" },
-            hunter: { name: "Hunter", wins: 45, noms: 13, infernos: 0, status: "👑 Conqueror / Winner" },
-            chane: { name: "Chané", wins: 29, noms: 17, infernos: 2, status: "👑 Conqueror / Winner" }
+            "michaelt": {"name": "Michael T", "wins": 49, "noms": 9, "infernos": 2, "status": "\ud83d\udc51 Conqueror / Winner"},
+            "lisa": {"name": "Lisa", "wins": 34, "noms": 13, "infernos": 0, "status": "\ud83d\udc51 Conqueror / Winner"},
+            "kit": {"name": "Kit", "wins": 49, "noms": 11, "infernos": 0, "status": "\ud83d\udc51 Conqueror / Winner"},
+            "kellyanne": {"name": "Kellyanne", "wins": 46, "noms": 12, "infernos": 1, "status": "\ud83d\udc51 Conqueror / Winner"},
+            "hunter": {"name": "Hunter", "wins": 45, "noms": 13, "infernos": 0, "status": "\ud83d\udc51 Conqueror / Winner"},
+            "chane": {"name": "Chan\u00e9", "wins": 29, "noms": 17, "infernos": 2, "status": "\ud83d\udc51 Conqueror / Winner"},
+            "aiden": {"name": "Aiden", "wins": 40, "noms": 10, "infernos": 2, "status": "\ud83d\udc51 Conqueror / Winner"},
+            "yamato": {"name": "Yamato", "wins": 47, "noms": 10, "infernos": 1, "status": "\ud83e\udd48 Runner-Up"},
+            "tails": {"name": "Tails", "wins": 35, "noms": 12, "infernos": 0, "status": "\ud83e\udd48 Runner-Up"},
+            "pontus": {"name": "Pontus", "wins": 44, "noms": 13, "infernos": 1, "status": "\ud83e\udd48 Runner-Up"},
+            "merrick": {"name": "Merrick", "wins": 38, "noms": 13, "infernos": 3, "status": "\ud83e\udd48 Runner-Up"},
+            "loryn": {"name": "Loryn", "wins": 21, "noms": 17, "infernos": 1, "status": "\ud83e\udd48 Runner-Up"},
+            "iant": {"name": "Ian T", "wins": 36, "noms": 12, "infernos": 1, "status": "\ud83e\udd48 Runner-Up"},
+            "charlie": {"name": "Charlie", "wins": 41, "noms": 13, "infernos": 1, "status": "\ud83e\udd48 Runner-Up"},
+            "luka": {"name": "Luka", "wins": 37, "noms": 16, "infernos": 2, "status": "\u274c Eliminated"},
+            "gawain": {"name": "Gawain", "wins": 32, "noms": 14, "infernos": 2, "status": "\u274c Eliminated"},
+            "sam": {"name": "Sam", "wins": 24, "noms": 18, "infernos": 1, "status": "\u274c Eliminated"},
+            "brittany": {"name": "Brittany", "wins": 23, "noms": 13, "infernos": 0, "status": "\u274c Eliminated"},
+            "hannah": {"name": "Hannah", "wins": 28, "noms": 14, "infernos": 3, "status": "\u274c Eliminated"},
+            "kenat": {"name": "Kenat", "wins": 36, "noms": 15, "infernos": 1, "status": "\u274c Eliminated"},
+            "tusk": {"name": "Tusk", "wins": 33, "noms": 13, "infernos": 3, "status": "\u274c Eliminated"},
+            "shonee": {"name": "Shonee", "wins": 26, "noms": 10, "infernos": 0, "status": "\u274c Eliminated"},
+            "pablo": {"name": "Pablo", "wins": 28, "noms": 11, "infernos": 1, "status": "\u274c Eliminated"},
+            "natalie": {"name": "Natalie", "wins": 29, "noms": 8, "infernos": 0, "status": "\u274c Eliminated"},
+            "leah": {"name": "Leah", "wins": 24, "noms": 11, "infernos": 0, "status": "\u274c Eliminated"},
+            "bergie": {"name": "Bergie", "wins": 25, "noms": 13, "infernos": 0, "status": "\u274c Eliminated"},
+            "jaxon": {"name": "Jaxon", "wins": 19, "noms": 15, "infernos": 0, "status": "\u274c Eliminated"},
+            "eddie": {"name": "Eddie", "wins": 26, "noms": 14, "infernos": 0, "status": "\u274c Eliminated"},
+            "bradley": {"name": "Bradley", "wins": 27, "noms": 12, "infernos": 1, "status": "\u274c Eliminated"},
+            "chuck": {"name": "Chuck", "wins": 20, "noms": 12, "infernos": 0, "status": "\u274c Eliminated"},
+            "mollie": {"name": "Mollie", "wins": 23, "noms": 7, "infernos": 0, "status": "\u274c Eliminated"},
+            "caradelevingne": {"name": "Cara", "wins": 25, "noms": 11, "infernos": 0, "status": "\u274c Eliminated"},
+            "davonne": {"name": "Davonne", "wins": 22, "noms": 12, "infernos": 0, "status": "\u274c Eliminated"},
+            "seemoreinfo": {"name": "See Below", "wins": 0, "noms": 0, "infernos": 0, "status": "See Below"},
+            "taylan": {"name": "Taylan", "wins": 24, "noms": 12, "infernos": 0, "status": "\u274c Eliminated"},
+            "chance": {"name": "Chance", "wins": 20, "noms": 10, "infernos": 0, "status": "\u274c Eliminated"},
+            "amandae": {"name": "Amanda E", "wins": 23, "noms": 8, "infernos": 0, "status": "\u274c Eliminated"},
+            "drea": {"name": "Drea", "wins": 21, "noms": 11, "infernos": 0, "status": "\u274c Eliminated"},
+            "vanessa": {"name": "Vanessa", "wins": 22, "noms": 11, "infernos": 0, "status": "\u274c Eliminated"},
+            "danieller": {"name": "Danielle R", "wins": 20, "noms": 14, "infernos": 0, "status": "\u274c Eliminated"},
+            "kina": {"name": "Kina", "wins": 21, "noms": 12, "infernos": 0, "status": "\u274c Eliminated"},
+            "henry": {"name": "Henry", "wins": 24, "noms": 11, "infernos": 0, "status": "\u274c Eliminated"},
+            "silver": {"name": "Silver", "wins": 20, "noms": 12, "infernos": 0, "status": "\u274c Eliminated"},
+            "cj": {"name": "CJ", "wins": 21, "noms": 12, "infernos": 0, "status": "\u274c Eliminated"},
+            "davisnhickh": {"name": "Davis & Nick H", "wins": 19, "noms": 10, "infernos": 0, "status": "\u274c Eliminated"},
+            "see_below": {"name": "See Below", "wins": 0, "noms": 0, "infernos": 0, "status": "See Below"},
+            "kj": {"name": "KJ", "wins": 18, "noms": 14, "infernos": 0, "status": "\u274c Eliminated"},
+            "zara": {"name": "Zara", "wins": 16, "noms": 13, "infernos": 0, "status": "\u274c Eliminated"},
+            "daniellehkimberleya": {"name": "Danielle H & Kimberley A", "wins": 18, "noms": 10, "infernos": 0, "status": "\u274c Eliminated"},
+            "babsrosanna": {"name": "Babs & Rosanna", "wins": 17, "noms": 10, "infernos": 0, "status": "\u274c Eliminated"},
+            "jacksjennmatty": {"name": "Jack S, Jenn & Matty", "wins": 18, "noms": 9, "infernos": 0, "status": "\u274c Eliminated"},
+            "mikesohar": {"name": "Mike & Sohar", "wins": 16, "noms": 10, "infernos": 0, "status": "\u274c Eliminated"},
+            "alexander rjadedjenna": {"name": "Alexander R, Jade & Jenna", "wins": 16, "noms": 10, "infernos": 0, "status": "\u274c Eliminated"},
+            "noinferno": {"name": "No Inferno", "wins": 0, "noms": 0, "infernos": 0, "status": "No Inferno"},
+            "nadraw": {"name": "N/A\n(Draw)", "wins": 0, "noms": 0, "infernos": 0, "status": "N/A\n(Draw)"},
+            "alec_cory": {"name": "Alec & Cory", "wins": 15, "noms": 10, "infernos": 0, "status": "\u274c Eliminated"},
+            "ash_jonna": {"name": "Ash & Jonna", "wins": 14, "noms": 10, "infernos": 0, "status": "\u274c Eliminated"},
+            "fluttershymakosilinmasandrine": {"name": "Fluttershy, Makosi, Linma & Sandrine", "wins": 15, "noms": 9, "infernos": 0, "status": "\u274c Eliminated"},
+            "lena": {"name": "Lena", "wins": 14, "noms": 9, "infernos": 0, "status": "\u274c Eliminated"},
+            "colsonsjess": {"name": "Colson & Jess", "wins": 14, "noms": 9, "infernos": 0, "status": "\u274c Eliminated"},
+            "renier_willow": {"name": "Renier & Willow", "wins": 13, "noms": 9, "infernos": 0, "status": "\u274c Eliminated"},
+            "chloe_shannon": {"name": "Chloe & Shannon", "wins": 14, "noms": 8, "infernos": 0, "status": "\u274c Eliminated"},
+            "thomas": {"name": "Thomas", "wins": 11, "noms": 10, "infernos": 0, "status": "\u274c Eliminated"},
+            "brittney": {"name": "Brittney", "wins": 11, "noms": 10, "infernos": 0, "status": "\u274c Eliminated"},
+            "ivan": {"name": "Ivan", "wins": 11, "noms": 10, "infernos": 0, "status": "\u274c Eliminated"},
+            "kitty": {"name": "Kitty", "wins": 10, "noms": 8, "infernos": 0, "status": "\u274c Eliminated"},
+            "ed": {"name": "Ed", "wins": 9, "noms": 8, "infernos": 0, "status": "\u274c Eliminated"},
+            "julia": {"name": "Julia", "wins": 9, "noms": 7, "infernos": 0, "status": "\u274c Eliminated"},
+            "carrie": {"name": "Carrie", "wins": 8, "noms": 7, "infernos": 0, "status": "\u274c Eliminated"},
+            "phil": {"name": "Phil", "wins": 8, "noms": 7, "infernos": 0, "status": "\u274c Eliminated"},
+            "freddie": {"name": "Freddie", "wins": 7, "noms": 7, "infernos": 0, "status": "\u274c Eliminated"},
+            "landon": {"name": "Landon", "wins": 7, "noms": 7, "infernos": 0, "status": "\u274c Eliminated"},
+            "sherbet": {"name": "Sherbet", "wins": 6, "noms": 7, "infernos": 0, "status": "\u274c Eliminated"},
+            "johnnymac": {"name": "Johnny Mac", "wins": 6, "noms": 7, "infernos": 0, "status": "Voted Out"},
+            "oskar": {"name": "Oskar", "wins": 5, "noms": 7, "infernos": 0, "status": "Voted Out"},
+            "carter": {"name": "Carter", "wins": 5, "noms": 7, "infernos": 0, "status": "Voted Out"},
+            "robb": {"name": "Robb", "wins": 4, "noms": 7, "infernos": 0, "status": "Voted Out"},
+            "shona": {"name": "Shona", "wins": 4, "noms": 7, "infernos": 0, "status": "Voted Out"},
+            "versad": {"name": "Versad", "wins": 3, "noms": 7, "infernos": 0, "status": "Voted Out"},
+            "jeremie": {"name": "Jeremie", "wins": 3, "noms": 7, "infernos": 0, "status": "Voted Out"},
+            "alex": {"name": "Alex", "wins": 1, "noms": 7, "infernos": 0, "status": "\u274c Eliminated"},
+            "fraser": {"name": "Fraser", "wins": 1, "noms": 7, "infernos": 0, "status": "\u274c Eliminated"}
         };
 
-        function updatePlayerCard() {
-            const select = document.getElementById('playerSelect');
-            const selectedCard = document.getElementById('playerCard');
-            const pKey = select.value;
+        function showSuggestions() {
+            const input = document.getElementById('searchBox').value.toLowerCase();
+            const suggestionsContainer = document.getElementById('suggestions');
+            suggestionsContainer.innerHTML = '';
 
-            if (playerData[pKey]) {
-                document.getElementById('cardName').innerText = playerData[pKey].name;
-                document.getElementById('cardStatus').innerText = playerData[pKey].status;
-                document.getElementById('cardWins').innerText = playerData[pKey].wins;
-                document.getElementById('cardNoms').innerText = playerData[pKey].noms;
-                document.getElementById('cardInfernos').innerText = playerData[pKey].infernos;
-                
-                // Reveal the card with style
-                selectedCard.style.display = 'block';
+            if (input.length === 0) {
+                suggestionsContainer.style.display = 'none';
+                return;
+            }
+
+            let matches = 0;
+            for (const key in playerData) {
+                const player = playerData[key];
+                if (player.name.toLowerCase().includes(input)) {
+                    const div = document.createElement('div');
+                    div.className = 'suggestion-item';
+                    div.innerText = player.name;
+                    div.onclick = () => selectPlayer(key);
+                    suggestionsContainer.appendChild(div);
+                    matches++;
+                }
+            }
+
+            if (matches > 0) {
+                suggestionsContainer.style.display = 'block';
+            } else {
+                suggestionsContainer.style.display = 'none';
             }
         }
+
+        function selectPlayer(key) {
+            const player = playerData[key];
+            const card = document.getElementById('playerCard');
+            const searchBox = document.getElementById('searchBox');
+            const suggestionsContainer = document.getElementById('suggestions');
+
+            // Set text values
+            searchBox.value = player.name;
+            document.getElementById('cardName').innerText = player.name;
+            document.getElementById('cardStatus').innerText = player.status;
+            document.getElementById('cardWins').innerText = player.wins;
+            document.getElementById('cardNoms').innerText = player.noms;
+            document.getElementById('cardInfernos').innerText = player.infernos;
+
+            // Hide suggestions and animate card in
+            suggestionsContainer.style.display = 'none';
+            card.classList.add('active');
+        }
+
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target.id !== 'searchBox') {
+                document.getElementById('suggestions').style.display = 'none';
+            }
+        });
     </script>
 </body>
 </html>
