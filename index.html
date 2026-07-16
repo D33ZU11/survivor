@@ -493,7 +493,7 @@
       </div>
     </div>
 
-    <div class="challenge-prompt" id="prompt-text">Drag Ram Back & Release to Smash!</div>
+    <div class="challenge-prompt" id="prompt-text">Drag Ram Left or Right & Release to Smash!</div>
   </div>
 
   <!-- ==========================================
@@ -552,7 +552,7 @@
   </div>
 
   <script>
-    // THE UNTRUNCATED DATABASE (ALL 154 CONTESTANTS INCLUDED)
+    // THE UNTRUNCATED DATABASE (ALL CONTESTANTS INCLUDED)
     const playersData = [
       {"Name": "Fraser", "Legacy": "FINALIST", "Original": "Contenders", "Cycle 16": "", "Cycle 17": "", "Shuffle": "", "Expand": "", "Swap": "", "Cycle 34": "", "Cycle 35": "", "2nd Exp": "", "Switch": "", "Disolve": "", "Merge": "", "Status": "Eliminated", "Episode": "Episode 7"},
       {"Name": "Alex", "Legacy": "CHAMPION", "Original": "Champions", "Cycle 16": "", "Cycle 17": "", "Shuffle": "", "Expand": "", "Swap": "", "Cycle 34": "", "Cycle 35": "", "2nd Exp": "", "Switch": "", "Disolve": "", "Merge": "", "Status": "Eliminated", "Episode": "Episode 14"},
@@ -667,7 +667,7 @@
       {"Name": "Andrew C", "Legacy": "ALL STAR", "Original": "Champions", "Cycle 16": "Champions", "Cycle 17": "Champions", "Shuffle": "Champions", "Expand": "Champions", "Swap": "Contenders", "Cycle 34": "Champions", "Cycle 35": "Champions", "2nd Exp": "Heroes", "Switch": "Heroes", "Disolve": "Vuna", "Merge": "Vuur", "Status": "Medical DQ", "Episode": "Episode 393"},
       {"Name": "Callum T", "Legacy": "ALL STAR", "Original": "Contenders", "Cycle 16": "Contenders", "Cycle 17": "Contenders", "Shuffle": "Contenders", "Expand": "Contenders", "Swap": "Contenders", "Cycle 34": "Contenders", "Cycle 35": "Contenders", "2nd Exp": "Heroes", "Switch": "Heroes", "Disolve": "Vuna", "Merge": "Vuur", "Status": "Purged", "Episode": "Episode 394"},
       {"Name": "Sandy B", "Legacy": "ALL STAR", "Original": "Champions", "Cycle 16": "Champions", "Cycle 17": "Champions", "Shuffle": "Champions", "Expand": "Champions", "Swap": "Contenders", "Cycle 34": "Champions", "Cycle 35": "Champions", "2nd Exp": "Heroes", "Switch": "Heroes", "Disolve": "Vuna", "Merge": "Vuur", "Status": "Purged", "Episode": "Episode 395"},
-      {"Name": "Andy", "Legacy": "ALL STAR", "Original": "Contenders", "Cycle 16": "Champions", "Cycle 17": "Champions", "Shuffle": "Champions", "Expand": "Champions", "Swap": "Contenders", "Cycle 34": "Champions", "Cycle 35": "Champions", "2nd Exp": "Heroes", "Switch": "Heroes", "Disolve": "Vuna", "Merge": "Vuur", "Status": "Purged", "Episode": "Episode 396"},
+      {"Name": "Andy", "Legacy": "ALL STAR", "Original": "Contenders", "Cycle 16": "Champions", "Cycle 17": "Champions", "Shuffle": "Champions", "Expand": "Contenders", "Swap": "Contenders", "Cycle 34": "Champions", "Cycle 35": "Champions", "2nd Exp": "Heroes", "Switch": "Heroes", "Disolve": "Vuna", "Merge": "Vuur", "Status": "Purged", "Episode": "Episode 396"},
       {"Name": "Arran S", "Legacy": "ALL STAR", "Original": "Contenders", "Cycle 16": "Contenders", "Cycle 17": "Contenders", "Shuffle": "Contenders", "Expand": "Contenders", "Swap": "Contenders", "Cycle 34": "Champions", "Cycle 35": "Contenders", "2nd Exp": "Heroes", "Switch": "Heroes", "Disolve": "Vuna", "Merge": "Vuur", "Status": "Purged", "Episode": "Episode 397"},
       {"Name": "Luke T", "Legacy": "FINALIST", "Original": "Contenders", "Cycle 16": "Contenders", "Cycle 17": "Contenders", "Shuffle": "Contenders", "Expand": "Contenders", "Swap": "Contenders", "Cycle 34": "Contenders", "Cycle 35": "Contenders", "2nd Exp": "Heroes", "Switch": "Heroes", "Disolve": "Vuna", "Merge": "Vuur", "Status": "Eliminated", "Episode": "Episode 398"},
       {"Name": "Michael T", "Legacy": "CHAMPION", "Original": "Champions", "Cycle 16": "Contenders", "Cycle 17": "Contenders", "Shuffle": "Contenders", "Expand": "Contenders", "Swap": "Contenders", "Cycle 34": "Champions", "Cycle 35": "Champions", "2nd Exp": "Heroes", "Switch": "Heroes", "Disolve": "Vuna", "Merge": "Vuur", "Status": "Winner", "Episode": "Episode 441"},
@@ -676,7 +676,7 @@
     ];
 
     // ==========================================
-    // PHYSICS-BASED BATTERING RAM / BOULDER ENGINE
+    // PHYSICS-BASED HOLD & RELEASE SWING ENGINE
     // ==========================================
     const ram = document.getElementById('ram');
     const boulder = document.getElementById('boulder');
@@ -692,7 +692,8 @@
     function startDrag(e) {
       isDragging = true;
       startX = e.clientX || e.touches[0].clientX;
-      ram.style.animation = 'none'; // Stop standard idle sway
+      ram.style.animation = 'none'; // Stop idle sway immediately
+      ram.style.transition = 'none'; // Lock to finger/mouse drag
     }
 
     function doDrag(e) {
@@ -700,32 +701,49 @@
       const x = e.clientX || (e.touches && e.touches[0].clientX);
       const deltaX = x - startX;
       
-      // Calculate angle of drawback (limit to left swing back -35 degrees to prevent breaks)
-      currentAngle = Math.max(-35, Math.min(0, deltaX * 0.15));
+      // Map drag to left & right swing angles (Allowed swing limits: -75 to 75 degrees)
+      currentAngle = Math.max(-75, Math.min(75, deltaX * 0.35));
+      
+      // Render holding positions directly
       ram.style.transform = `rotate(${currentAngle}deg)`;
+
+      // Dynamic feedback prompt
+      if (Math.abs(currentAngle) > 15) {
+        promptText.textContent = "RELEASE TO UNLEASH THE SMASH!";
+        promptText.style.color = '#ff3c00';
+      } else {
+        promptText.textContent = "Pull further left or right...";
+        promptText.style.color = '#ff9d00';
+      }
     }
 
     function endDrag() {
       if (!isDragging) return;
       isDragging = false;
 
-      // If they pulled it back far enough, trigger the big hit
-      if (currentAngle < -10) {
+      // If the ram was pulled far enough, execute the dynamic slam back
+      if (Math.abs(currentAngle) > 15) {
         promptText.textContent = "SMASHING!";
-        ram.style.transition = 'transform 0.18s cubic-bezier(0.25, 1, 0.5, 1)';
         
-        // Ram swings violently forward to hit the stone (+5 degrees to pass through slightly)
-        ram.style.transform = 'rotate(8deg)';
+        // Calculate dynamic fast velocity based on how far it was pulled
+        const transitionSpeed = Math.max(0.12, 0.25 - (Math.abs(currentAngle) * 0.0015));
+        ram.style.transition = `transform ${transitionSpeed}s cubic-bezier(0.25, 1, 0.5, 1)`;
+        
+        // Swing violently to the complete opposite side to execute slam
+        const overshootAngle = currentAngle > 0 ? -15 : 15;
+        ram.style.transform = `rotate(${overshootAngle}deg)`;
 
-        // Handle impact
+        // Trigger dynamic impact frame relative to the swing velocity
         setTimeout(() => {
           shatterBoulder();
-        }, 180);
+        }, transitionSpeed * 1000 * 0.9);
 
       } else {
-        // Not enough force, reset to idle sway
+        // Soft escape reset to idle sway
         ram.style.transition = 'transform 0.5s ease';
         ram.style.transform = 'rotate(0deg)';
+        promptText.textContent = "Drag Ram Left or Right & Release to Smash!";
+        promptText.style.color = '#ff9d00';
         setTimeout(() => {
           ram.style.transition = '';
           ram.style.animation = 'gentleSway 4s ease-in-out infinite alternate';
@@ -733,7 +751,7 @@
       }
     }
 
-    // Connect Drag Listeners
+    // Connect Grab Listeners
     ram.addEventListener('mousedown', startDrag);
     window.addEventListener('mousemove', doDrag);
     window.addEventListener('mouseup', endDrag);
@@ -744,8 +762,8 @@
 
     // Shatter Boulder Particle Explosion Engine
     function shatterBoulder() {
-      // Shake the screen slightly on hit
-      boulder.style.transform = 'scale(0.95) translate(15px, 0)';
+      // Impact shake
+      boulder.style.transform = 'scale(0.9) translate(20px, -5px)';
       
       setTimeout(() => {
         const rect = boulder.getBoundingClientRect();
@@ -757,12 +775,11 @@
           const shard = document.createElement('div');
           shard.classList.add('stone-shard');
 
-          // Generate sharp rocky triangles and squares of random shapes
+          // Custom rock shapes
           const size = Math.random() * 40 + 20;
           shard.style.width = `${size}px`;
           shard.style.height = `${size}px`;
           
-          // Flame glow borders on flying stones
           shard.style.background = 'radial-gradient(circle, #444, #1c1c1c)';
           shard.style.borderColor = Math.random() > 0.5 ? '#ff4a00' : '#111';
           shard.style.borderRadius = `${Math.random() * 50}% ${Math.random() * 50}% ${Math.random() * 50}% ${Math.random() * 50}%`;
@@ -772,14 +789,13 @@
 
           landing.appendChild(shard);
 
-          // Calculate raw trajectory velocity
+          // Path direction velocities
           const angle = Math.random() * Math.PI * 2;
           const force = Math.random() * 25 + 15;
           const velX = Math.cos(angle) * force;
           const velY = Math.sin(angle) * force;
           let rot = Math.random() * 360;
 
-          // Animate particle drift physics
           let tick = 0;
           const particleTimer = setInterval(() => {
             tick++;
@@ -787,7 +803,7 @@
             const currentTop = parseFloat(shard.style.top);
             
             shard.style.left = `${currentLeft + velX}px`;
-            shard.style.top = `${currentTop + velY + (tick * 0.4)}px`; // Apply a tiny bit of gravity drop
+            shard.style.top = `${currentTop + velY + (tick * 0.4)}px`; // Downwards gravity drift
             shard.style.transform = `rotate(${rot + tick * 5}deg)`;
             shard.style.opacity = 1 - (tick / 50);
 
@@ -798,12 +814,11 @@
           }, 16);
         }
 
-        // Hide the original boulder and ramp visual elements
+        // Clean layout out
         boulder.style.display = 'none';
         ram.style.display = 'none';
         document.querySelector('.gallows').style.display = 'none';
 
-        // Gracefully fade the landing layout away to reveal the engine
         setTimeout(() => {
           landing.classList.add('fade-out');
           app.classList.add('visible');
@@ -812,7 +827,9 @@
       }, 80);
     }
 
-    // Grid rendering and Search/Filter Engine
+    // ==========================================
+    // GRID RENDERING, SEARCH & FILTER PANEL ENGINE
+    // ==========================================
     const grid = document.getElementById('cards-grid');
     const searchInput = document.getElementById('search-input');
     const legacyFilter = document.getElementById('legacy-filter');
@@ -879,49 +896,46 @@
       `;
     }
 
-    // Filter Logic
+    // Core Filtering Loop Logic
     function filterPlayers() {
       const query = searchInput.value.toLowerCase().trim();
       const legacyVal = legacyFilter.value;
       const originalVal = originalFilter.value;
       const statusVal = statusFilter.value;
 
-      // RULE: If search input is blank AND no filters are selected, show NOTHING
-      if (query === "" && legacyVal === "ALL" && originalVal === "ALL" && statusVal === "ALL") {
-        grid.innerHTML = '<div class="empty-state">Search for a contestant or adjust filters to explore team journeys.</div>';
-        resultsCount.textContent = "Search above to find contestants.";
-        return;
-      }
-
-      let filtered = playersData.filter(player => {
+      const filtered = playersData.filter(player => {
         const matchesSearch = player.Name.toLowerCase().includes(query);
-        const matchesLegacy = legacyVal === 'ALL' || player.Legacy.toUpperCase() === legacyVal;
-        const matchesOriginal = originalVal === 'ALL' || player.Original === originalVal;
-        const matchesStatus = statusVal === 'ALL' || player.Status === statusVal;
+        const matchesLegacy = legacyVal === "ALL" || player.Legacy === legacyVal;
+        const matchesOriginal = originalVal === "ALL" || player.Original === originalVal;
+        const matchesStatus = statusVal === "ALL" || player.Status === statusVal;
 
         return matchesSearch && matchesLegacy && matchesOriginal && matchesStatus;
       });
 
-      grid.innerHTML = '';
-      if (filtered.length === 0) {
-        grid.innerHTML = '<div class="empty-state">No contestants match your criteria. Try adjusting the filters.</div>';
-        resultsCount.textContent = "0 results found.";
-      } else {
-        filtered.forEach(player => {
-          grid.innerHTML += createPlayerCard(player);
-        });
-        resultsCount.textContent = `Showing ${filtered.length} of ${playersData.length} contestants`;
-      }
+      renderGrid(filtered);
     }
 
-    // Connect event listeners
+    function renderGrid(players) {
+      grid.innerHTML = "";
+      if (players.length === 0) {
+        grid.innerHTML = `<div class="empty-state">No contestants match your selected filters.</div>`;
+        resultsCount.textContent = "0 contestants found.";
+        return;
+      }
+
+      const cardsMarkup = players.map(player => createPlayerCard(player)).join('');
+      grid.innerHTML = cardsMarkup;
+      resultsCount.textContent = `Showing ${players.length} contestant${players.length > 1 ? 's' : ''}.`;
+    }
+
+    // Attach Event Listeners to Search Controls
     searchInput.addEventListener('input', filterPlayers);
     legacyFilter.addEventListener('change', filterPlayers);
     originalFilter.addEventListener('change', filterPlayers);
     statusFilter.addEventListener('change', filterPlayers);
 
-    // Run initially to show the correct "empty" state prompt
-    filterPlayers();
+    // Initial Database Render
+    renderGrid(playersData);
   </script>
 </body>
 </html>
